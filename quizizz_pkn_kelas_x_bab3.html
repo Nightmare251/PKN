@@ -1,0 +1,251 @@
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Baloo+2:wght@700;800&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0f0c29;--surface:#1a1640;--card:#231f52;
+  --accent:#ff6b6b;--accent2:#ffd93d;--accent3:#6bcb77;--accent4:#4d96ff;
+  --text:#fff;--muted:rgba(255,255,255,0.6);
+  --correct:#6bcb77;--wrong:#ff6b6b;--reveal:#ffd93d;
+}
+body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+#app{max-width:760px;margin:0 auto;padding:1rem}
+
+#start-screen{text-align:center;padding:3rem 1rem}
+#start-screen h1{font-family:'Baloo 2',cursive;font-size:2.8rem;font-weight:800;background:linear-gradient(135deg,#ff6b6b,#ffd93d,#6bcb77,#4d96ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;line-height:1.2;margin-bottom:.5rem}
+#start-screen p{color:var(--muted);font-size:1rem;margin-bottom:.3rem}
+.total-badge{display:inline-block;background:var(--accent2);color:#1a1640;font-weight:800;font-size:.9rem;padding:.3rem .9rem;border-radius:99px;margin:.5rem 0 2rem}
+#start-btn{background:linear-gradient(135deg,#ff6b6b,#ff8e53);border:none;color:#fff;font-family:'Baloo 2',cursive;font-size:1.3rem;font-weight:700;padding:.8rem 3rem;border-radius:99px;cursor:pointer;box-shadow:0 4px 20px rgba(255,107,107,.4);transition:transform .15s,box-shadow .15s}
+#start-btn:hover{transform:translateY(-2px);box-shadow:0 6px 24px rgba(255,107,107,.5)}
+
+#quiz-screen{display:none}
+.progress-bar-wrap{background:rgba(255,255,255,.1);border-radius:99px;height:8px;margin-bottom:1rem;overflow:hidden}
+.progress-bar-fill{height:100%;background:linear-gradient(90deg,#ff6b6b,#ffd93d);border-radius:99px;transition:width .4s}
+.top-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:.5rem}
+.q-counter{font-size:.9rem;color:var(--muted)}
+.score-display{font-size:.9rem;font-weight:700;color:var(--accent2)}
+.timer-bar-wrap{background:rgba(255,255,255,.1);border-radius:99px;height:6px;margin-bottom:1.2rem;overflow:hidden}
+.timer-bar{height:100%;background:var(--accent4);border-radius:99px;transition:width .1s linear}
+.q-card{background:var(--card);border-radius:18px;padding:1.5rem;margin-bottom:1rem;border:1px solid rgba(255,255,255,.08)}
+.q-number{font-size:.8rem;font-weight:700;color:var(--accent2);text-transform:uppercase;letter-spacing:1px;margin-bottom:.6rem}
+.q-text{font-size:1rem;font-weight:600;line-height:1.6;color:#fff}
+.q-image{width:100%;max-height:200px;object-fit:contain;border-radius:10px;margin-top:.8rem;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1)}
+.options-grid{display:grid;grid-template-columns:1fr 1fr;gap:.7rem}
+@media(max-width:480px){.options-grid{grid-template-columns:1fr}}
+.opt-btn{background:rgba(255,255,255,.06);border:1.5px solid rgba(255,255,255,.15);border-radius:14px;padding:.85rem 1rem;color:#fff;font-family:'Nunito',sans-serif;font-size:.95rem;font-weight:600;cursor:pointer;text-align:left;transition:all .18s;line-height:1.4;position:relative;overflow:hidden}
+.opt-btn:hover:not(:disabled){background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.3);transform:translateY(-1px)}
+.opt-btn.correct{background:rgba(107,203,119,.18);border-color:var(--correct);color:#fff}
+.opt-btn.wrong{background:rgba(255,107,107,.18);border-color:var(--wrong);color:#fff}
+.opt-btn.reveal{background:rgba(255,217,61,.12);border-color:var(--reveal)}
+.opt-btn:disabled{cursor:default}
+.feedback-bar{border-radius:12px;padding:.75rem 1rem;margin-bottom:.8rem;font-weight:700;font-size:.95rem;display:none;align-items:center;gap:.5rem}
+.feedback-bar.show{display:flex}
+.feedback-bar.correct-fb{background:rgba(107,203,119,.2);border:1px solid var(--correct);color:var(--correct)}
+.feedback-bar.wrong-fb{background:rgba(255,107,107,.2);border:1px solid var(--wrong);color:#ff9999}
+#next-btn{width:100%;background:linear-gradient(135deg,#4d96ff,#6bcb77);border:none;color:#fff;font-family:'Baloo 2',cursive;font-size:1.1rem;font-weight:700;padding:.8rem;border-radius:12px;cursor:pointer;display:none;margin-top:.5rem;transition:opacity .15s}
+#next-btn:hover{opacity:.9}
+
+#result-screen{display:none;text-align:center;padding:2rem 1rem}
+.result-emoji{font-size:4rem;margin-bottom:1rem}
+.result-title{font-family:'Baloo 2',cursive;font-size:2rem;font-weight:800;margin-bottom:.5rem}
+.result-score{font-size:4rem;font-weight:900;font-family:'Baloo 2',cursive;background:linear-gradient(135deg,#ffd93d,#ff6b6b);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.result-sub{color:var(--muted);margin:.5rem 0 1.5rem}
+.stats-row{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;margin:1rem 0 2rem}
+.stat-box{background:var(--card);border-radius:14px;padding:.8rem 1.4rem;min-width:100px;border:1px solid rgba(255,255,255,.08)}
+.stat-box .val{font-size:1.6rem;font-weight:800;font-family:'Baloo 2',cursive}
+.stat-box .lbl{font-size:.75rem;color:var(--muted);margin-top:.2rem}
+.stat-box.c{--v:var(--correct)}.stat-box.w{--v:var(--wrong)}.stat-box.c .val,.stat-box.w .val{color:var(--v)}
+#restart-btn{background:linear-gradient(135deg,#ff6b6b,#ffd93d);border:none;color:#fff;font-family:'Baloo 2',cursive;font-size:1.2rem;font-weight:700;padding:.8rem 2.5rem;border-radius:99px;cursor:pointer;box-shadow:0 4px 16px rgba(255,107,107,.3)}
+</style>
+
+<div id="app">
+<div id="start-screen">
+  <h1>🇮🇩 Kuis PKn Kelas X</h1>
+  <p>Bab III – Keberagaman dalam Bingkai Bhinneka Tunggal Ika</p>
+  <div class="total-badge">30 Soal Pilihan Ganda</div>
+  <br>
+  <button id="start-btn" onclick="startGame()">Mulai Bermain ▶</button>
+</div>
+
+<div id="quiz-screen">
+  <div class="progress-bar-wrap"><div class="progress-bar-fill" id="prog"></div></div>
+  <div class="top-row">
+    <span class="q-counter" id="q-counter"></span>
+    <span class="score-display" id="score-disp">⭐ 0</span>
+  </div>
+  <div class="timer-bar-wrap"><div class="timer-bar" id="timer-bar"></div></div>
+  <div class="q-card">
+    <div class="q-number" id="q-num"></div>
+    <div class="q-text" id="q-text"></div>
+  </div>
+  <div class="feedback-bar" id="feedback"></div>
+  <div class="options-grid" id="opts"></div>
+  <button id="next-btn" onclick="nextQuestion()">Soal Berikutnya →</button>
+</div>
+
+<div id="result-screen">
+  <div class="result-emoji" id="r-emoji"></div>
+  <div class="result-title" id="r-title"></div>
+  <div class="result-score" id="r-score"></div>
+  <div class="result-sub" id="r-sub"></div>
+  <div class="stats-row">
+    <div class="stat-box c"><div class="val" id="r-correct"></div><div class="lbl">Benar</div></div>
+    <div class="stat-box w"><div class="val" id="r-wrong"></div><div class="lbl">Salah</div></div>
+    <div class="stat-box"><div class="val" id="r-pct"></div><div class="lbl">Akurasi</div></div>
+  </div>
+  <button id="restart-btn" onclick="startGame()">🔄 Main Lagi</button>
+</div>
+</div>
+
+<script>
+const SOAL = [
+  {id:1,q:"Perhatikan wilayah berikut!\n(1) Asia Utara\n(2) Asia Tengah\n(3) Asia Timur\n(4) Semenanjung Melayu\n(5) Amerika Utara\n\nWilayah di atas yang merupakan ras Mongoloid, kecuali nomor....",benar:"D. (4) dan (5)",opsi:["A. (1) dan (2)","B. (2) dan (3)","C. (3) dan (4)","D. (4) dan (5)","E. (1) dan (5)"]},
+  {id:2,q:"Masyarakat Bali menggalakkan suatu program guna mempertahankan kebudayaan di dalam kehidupan masyarakat Bali yang makin lama terlihat makin memudar karena budaya asing yang masuk begitu saja dalam kehidupan masyarakat yang disebut....",benar:"D. ajeg Bali",opsi:["A. ngawuruk","B. kasodo","C. ngaben","D. ajeg Bali","E. sambatan"]},
+  {id:3,q:"Perbedaan tentang ras banyak ditunjukkan dengan perbedaan....",benar:"C. fisik",opsi:["A. biologis","B. mental","C. fisik","D. gaya bicara","E. gender"]},
+  {id:4,q:"Upacara ngaben adalah salah satu keberagaman budaya Indonesia yang berasal dari daerah....",benar:"D. Bali",opsi:["A. Sulawesi","B. Sumatra","C. Jawa","D. Bali","E. Madura"]},
+  {id:5,q:"Berikut yang termasuk keberagaman budaya di Indonesia, kecuali....",benar:"A. mata uang",opsi:["A. mata uang","B. bahasa daerah","C. rumah adat","D. senjata khas","E. pakaian adat"]},
+  {id:6,q:"Perilaku mewujudkan sikap menghormati budaya daerah lain adalah....",benar:"A. bersikap positif terhadap budaya lain",opsi:["A. bersikap positif terhadap budaya lain","B. menonjolkan budaya daerah sendiri","C. hanya menikmati budaya daerah sendiri","D. bersikap negatif terhadap budaya lain","E. bersikap apatis pada suku lain"]},
+  {id:7,q:"Di Indonesia ada beberapa golongan ras berikut ini, kecuali....",benar:"C. Negroid",opsi:["A. Papua Melanesoid","B. Weddoid","C. Negroid","D. Kaukasoid","E. Melayu Mongoloid"]},
+  {id:8,q:"Nama suku yang terdapat di kawasan Bali dan Nusa Tenggara adalah....",benar:"B. Bima",opsi:["A. Badui","B. Bima","C. Gayo Alas","D. Dayak","E. Bugis"]},
+  {id:9,q:"Tarian yang berasal dari Sulawesi Utara adalah tari....",benar:"C. maengket",opsi:["A. seudati","B. jaipong","C. maengket","D. piring","E. yapong"]},
+  {id:10,q:"Suatu kegiatan yang dilakukan secara bersama-sama dan bersifat sukarela agar kegiatan yang dikerjakan dapat berjalan dengan lancar dalam masyarakat Indonesia disebut....",benar:"A. gotong royong",opsi:["A. gotong royong","B. sukuisme","C. chauvinisme","D. individualisme","E. persatuan"]},
+  {id:11,q:"Berikut yang bukan tujuan dari gotong royong adalah....",benar:"D. menghemat pengeluaran",opsi:["A. bertujuan untuk meningkatkan tali persaudaraan dan kebersamaan antarwarga","B. mengajak setiap orang untuk selalu bekerja sama","C. meningkatkan rasa persatuan dan kesatuan","D. menghemat pengeluaran","E. menumbuhkan kedamaian dan ketenteraman antarwarga"]},
+  {id:12,q:"Saling menghormati antarpemeluk agama dapat diwujudkan dengan....",benar:"C. saling membantu bila ditimpa musibah tanpa membedakan agama",opsi:["A. menjalankan ibadah sesuai dengan ajaran agamanya","B. saling menghargai teman yang seagama","C. saling membantu bila ditimpa musibah tanpa membedakan agama","D. mendorong meningkatkan keakraban kepada teman seagama","E. membantu teman yang beribadah"]},
+  {id:13,q:"Wujud kebudayaan berupa suatu kompleks ide-ide, gagasan-gagasan, nilai-nilai, dan sebagainya disebut....",benar:"A. sistem budaya",opsi:["A. sistem budaya","B. sistem sosial","C. artefak","D. suku bangsa","E. adat"]},
+  {id:14,q:"Serimpi, Kecak, Caman, dan Piring adalah nama....",benar:"B. tarian daerah",opsi:["A. lagu daerah","B. tarian daerah","C. bahasa daerah","D. alat musik","E. alat bersenjata"]},
+  {id:15,q:"Berikut yang bukan ciri-ciri suku bangsa adalah....",benar:"B. sekumpulan manusia yang tidak mempunyai adat istiadat",opsi:["A. secara tertutup berkembang biak dalam kelompoknya","B. sekumpulan manusia yang tidak mempunyai adat istiadat","C. mewujudkan arena komunikasi dan interaksi","D. memiliki nilai-nilai dasar yang terwujud dan tercermin dalam kebudayaan","E. kesamaan perilaku"]},
+  {id:16,q:"Cara menghargai keberagaman agama yang ada adalah dengan cara....",benar:"D. tidak gaduh jika ada orang lain yang beribadah",opsi:["A. pura-pura tidak tahu","B. mengikuti ibadah agama orang lain","C. mengotori tempat ibadah agama orang lain","D. tidak gaduh jika ada orang lain yang beribadah","E. membantu teman yang beribadah"]},
+  {id:17,q:"Suku Madura berasal dari Provinsi....",benar:"C. Jawa Timur",opsi:["A. Maluku","B. Palembang","C. Jawa Timur","D. Jawa Tengah","E. Papua"]},
+  {id:18,q:"Suku Batak merupakan suku bangsa dari....",benar:"C. Sumatra Utara",opsi:["A. Sumatra Selatan","B. Aceh","C. Sumatra Utara","D. Sumatra Barat","E. Jawa Barat"]},
+  {id:19,q:"Rumah joglo adalah rumah adat dari....",benar:"D. Jawa Tengah",opsi:["A. Riau","B. Bengkulu","C. Kalimantan Barat","D. Jawa Tengah","E. Jawa Timur"]},
+  {id:20,q:"Ngaben adalah upacara adat pembakaran mayat di....",benar:"A. Bali",opsi:["A. Bali","B. Sulawesi","C. Papua","D. Madura","E. Kalimantan"]},
+  {id:21,q:"Perhatikan suku-suku berikut!\n(1) Minangkabau\n(2) Penghulu\n(3) Batin\n(4) Kubu\n(5) Tanjung Koto\n\nSuku di atas yang berasal dari Sumatra Barat ditunjukkan oleh nomor....",benar:"A. (1) dan (2)",opsi:["A. (1) dan (2)","B. (2) dan (3)","C. (3) dan (4)","D. (4) dan (5)","E. (1) dan (5)"]},
+  {id:22,q:"Perhatikan pernyataan berikut!\n(1) Adanya keinginan pemenuhan atau peningkatan untuk kesejahteraan.\n(2) Gotong royong dapat terlaksana karena manusia merupakan makhluk sosial.\n(3) Menghemat pengeluaran.\n(4) Mempercepat suatu pekerjaan.\n(5) Meningkatkan kekompakan antarwarga dan juga untuk mengenal satu sama lain.\n\nPernyataan di atas yang merupakan faktor yang mempengaruhi adanya gotong royong ditunjukkan oleh nomor....",benar:"A. (1) dan (2)",opsi:["A. (1) dan (2)","B. (2) dan (3)","C. (3) dan (4)","D. (4) dan (5)","E. (5) dan (1)"]},
+  {id:23,q:"Berikut nilai-nilai yang terdapat dalam kegiatan gotong-royong, kecuali....",benar:"E. egoisme",opsi:["A. kebersamaan","B. persatuan","C. rela berkorban","D. tolong-menolong","E. egoisme"]},
+  {id:24,q:"Lagu daerah Apuse berasal dari....",benar:"A. Papua",opsi:["A. Papua","B. Sulawesi Utara","C. Jawa Barat","D. Bali","E. Sumatra Selatan"]},
+  {id:25,q:"Gotong royong yang dipakai di wilayah Pulau Jawa seperti daerah Gunungkidul, Yogyakarta disebut....",benar:"C. gugur gunung",opsi:["A. song osong lombhung","B. sambatan","C. gugur gunung","D. ngayah","E. ngaben"]},
+  {id:26,q:"Contoh lagu daerah yang berasal dari Aceh adalah....",benar:"A. Singsing So, Butet, dan Tillo-Tillo",opsi:["A. Singsing So, Butet, dan Tillo-Tillo","B. Bungong Jeumpa","C. Tokecang, Manuk Dadali, dan Borondong Garing","D. Kampuang Nan Jauh di Mato","E. Gundhul-Gundhul Pacul"]},
+  {id:27,q:"Tari kipas berasal dari daerah....",benar:"A. Sulawesi Selatan",opsi:["A. Sulawesi Selatan","B. Bali","C. Sulawesi Utara","D. Maluku","E. Jawa Tengah"]},
+  {id:28,q:"Wujud dalam bentuk perilaku menghargai dan toleran terhadap keberagaman bangsa Indonesia merupakan salah satu keterampilan yang harus dimiliki oleh setiap warga negara Indonesia dalam....",benar:"B. bermasyarakat",opsi:["A. bernegara","B. bermasyarakat","C. berpolitik","D. berkuasa","E. berbangsa"]},
+  {id:29,q:"Suku yang terdapat di Pulau Kalimantan ialah....",benar:"D. Dayak",opsi:["A. Badui","B. Bugis","C. Gayo Alas","D. Dayak","E. Batak"]},
+  {id:30,q:"Perhatikan pernyataan-pernyataan berikut!\n(1) Violence atau kekerasan terhadap perempuan, baik fisik, seksual, dan psikologis.\n(2) Stereotip atau pelabelan negatif terhadap sikap dan perbuatan perempuan.\n(3) Double burden atau beban ganda adalah pembagian tugas yang selalu memberatkan perempuan.\n(4) Menguatkan aturan untuk melawan kekerasan terhadap perempuan.\n(5) Membentuk organisasi dan jaringan perempuan agar lebih kuat.\n\nYang bukan bentuk ketidakadilan gender ditunjukkan oleh nomor....",benar:"D. (4) dan (5)",opsi:["A. (1) dan (2)","B. (2) dan (3)","C. (3) dan (4)","D. (4) dan (5)","E. (1) dan (5)"]}
+];
+
+let questions=[],cur=0,score=0,benar=0,salah=0,answered=false,timerInt=null,timeLeft=30;
+
+function shuffle(arr){let a=[...arr];for(let i=a.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+
+function prepareQuestions(){
+  questions=shuffle([...SOAL]).map(s=>{
+    let correct=s.benar;
+    let others=s.opsi.filter(o=>o!==correct);
+    let shuffledOthers=shuffle(others);
+    let pool=[correct,...shuffledOthers.slice(0,3)];
+    return{...s,shuffled:shuffle(pool)};
+  });
+}
+
+function startGame(){
+  prepareQuestions();
+  cur=0;score=0;benar=0;salah=0;
+  document.getElementById('start-screen').style.display='none';
+  document.getElementById('result-screen').style.display='none';
+  document.getElementById('quiz-screen').style.display='block';
+  showQuestion();
+}
+
+function showQuestion(){
+  answered=false;
+  clearInterval(timerInt);
+  timeLeft=30;
+  const q=questions[cur];
+  document.getElementById('q-counter').textContent=`Soal ${cur+1} / ${questions.length}`;
+  document.getElementById('score-disp').textContent=`⭐ ${score}`;
+  document.getElementById('prog').style.width=`${(cur/questions.length)*100}%`;
+  document.getElementById('q-num').textContent=`SOAL ${q.id}`;
+  document.getElementById('q-text').textContent=q.q;
+  document.getElementById('feedback').className='feedback-bar';
+  document.getElementById('next-btn').style.display='none';
+  const tb=document.getElementById('timer-bar');
+  tb.style.width='100%';tb.style.background='var(--accent4)';
+
+  const opts=document.getElementById('opts');
+  opts.innerHTML='';
+  q.shuffled.forEach(opt=>{
+    const b=document.createElement('button');
+    b.className='opt-btn';
+    b.textContent=opt;
+    b.onclick=()=>selectAnswer(b,opt,q.benar);
+    opts.appendChild(b);
+  });
+
+  timerInt=setInterval(()=>{
+    timeLeft-=0.1;
+    const pct=Math.max(0,timeLeft/30*100);
+    tb.style.width=pct+'%';
+    if(pct<30)tb.style.background='var(--accent)';
+    if(timeLeft<=0){clearInterval(timerInt);autoFail(q.benar);}
+  },100);
+}
+
+function autoFail(benarOpt){
+  if(answered)return;
+  answered=true;salah++;
+  document.querySelectorAll('.opt-btn').forEach(b=>{
+    b.disabled=true;
+    if(b.textContent===benarOpt)b.className='opt-btn reveal';
+  });
+  const fb=document.getElementById('feedback');
+  fb.textContent='⏰ Waktu habis! Jawaban: '+benarOpt;
+  fb.className='feedback-bar wrong-fb show';
+  document.getElementById('next-btn').style.display='block';
+}
+
+function selectAnswer(btn,chosen,correct){
+  if(answered)return;
+  answered=true;
+  clearInterval(timerInt);
+  document.querySelectorAll('.opt-btn').forEach(b=>{
+    b.disabled=true;
+    if(b.textContent===correct)b.className='opt-btn correct';
+  });
+  const fb=document.getElementById('feedback');
+  if(chosen===correct){
+    btn.className='opt-btn correct';
+    score+=10;benar++;
+    fb.textContent='✅ Benar! +10 poin';
+    fb.className='feedback-bar correct-fb show';
+  }else{
+    btn.className='opt-btn wrong';
+    salah++;
+    fb.textContent='❌ Salah! Jawaban benar: '+correct;
+    fb.className='feedback-bar wrong-fb show';
+  }
+  document.getElementById('score-disp').textContent=`⭐ ${score}`;
+  document.getElementById('next-btn').style.display='block';
+}
+
+function nextQuestion(){
+  cur++;
+  if(cur>=questions.length)showResult();
+  else showQuestion();
+}
+
+function showResult(){
+  clearInterval(timerInt);
+  document.getElementById('quiz-screen').style.display='none';
+  document.getElementById('result-screen').style.display='block';
+  const pct=Math.round(benar/questions.length*100);
+  let emoji='😎',title='Luar Biasa!';
+  if(pct<40){emoji='😅';title='Perlu Belajar Lagi!';}
+  else if(pct<60){emoji='🙂';title='Lumayan!';}
+  else if(pct<80){emoji='😊';title='Bagus!';}
+  document.getElementById('r-emoji').textContent=emoji;
+  document.getElementById('r-title').textContent=title;
+  document.getElementById('r-score').textContent=score+' poin';
+  document.getElementById('r-sub').textContent=`${benar} benar dari ${questions.length} soal (${pct}%)`;
+  document.getElementById('r-correct').textContent=benar;
+  document.getElementById('r-wrong').textContent=salah;
+  document.getElementById('r-pct').textContent=pct+'%';
+}
+</script>
